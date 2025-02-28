@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Filter Leaves</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css">
+  <style>
+    body {
+      margin: 0;
+      background-color: #f8f9fa; /* Light gray background */
+      font-family: 'Arial', sans-serif;
+    }
+    .navbar {
+      background-color: #ffffff; /* White navbar */
+      padding: 0.5rem 1rem;
+      box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+    }
+    .navbar-brand {
+      font-weight: bold;
+      color: #000000; /* Black text */
+      font-size: 1.25rem;
+    }
+    .navbar-nav .nav-link {
+      font-weight: 500;
+      color: #000000; /* Black text */
+      margin-right: 1rem;
+      font-size: 1rem;
+    }
+    .navbar-nav .nav-link:hover {
+      color: #0d6efd; /* Primary blue on hover */
+    }
+    .btn-logout {
+      font-weight: 500;
+      color: #ffffff;
+      background-color: #0d6efd; /* Blue button */
+      border: none;
+      padding: 0.4rem 1rem;
+      font-size: 0.9rem;
+      border-radius: 0.25rem;
+    }
+    .btn-logout:hover {
+      background-color: #084298; /* Darker blue on hover */
+    }
+    .container {
+      margin-top: 5rem; /* Space below navbar */
+      width: 50%; /* Reduced container width */
+    }
+    h2 {
+      font-weight: bold;
+      color: #000000; /* Black text for headings */
+      margin-bottom: 1rem;
+    }
+    .form-container {
+      background: #ffffff; /* White card-style form */
+      padding: 2rem;
+      border-radius: 0.5rem;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+    .form-label {
+      font-weight: 500;
+      color: #333333; /* Darker text */
+    }
+    #nameList {
+  max-height: 200px; /* Set the height limit as needed */
+  overflow-y: auto; /* Enables vertical scrolling */
+  border: 1px solid #ddd; /* Optional, just to make it visible */
+  border-radius: 0.25rem;
+}
+    .btn-submit {
+      background-color: #0d6efd; /* Blue button */
+      color: #ffffff;
+      border: none;
+      padding: 0.5rem 1rem;
+      font-size: 1rem;
+      border-radius: 0.25rem;
+      width: 100%; /* Full width button */
+      margin-top: 1rem;
+    }
+    .btn-submit:hover {
+      background-color: #084298; /* Darker blue on hover */
+    }
+    .btn-back {
+      color: #ffffff;
+      background-color: #6c757d; /* Secondary gray button */
+      border: none;
+      padding: 0.5rem 1rem;
+      font-size: 1rem;
+      border-radius: 0.25rem;
+      margin-right: 1rem;
+    }
+    .btn-back:hover {
+      background-color: #5a6268; /* Darker gray on hover */
+    }
+    #resultMessage {
+      margin-top: 1rem; /* Add spacing only when visible */
+    }
+    .d-none {
+      display: none;
+    }
+
+  </style>
+   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+   <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
+   <script>
+    
+     function clearMessage() {
+       const messageDiv = document.getElementById('resultMessage');
+       if (messageDiv) {
+         messageDiv.innerHTML = ''; // Clear message content
+         messageDiv.classList.add('d-none'); // Hide the message container
+       }
+     }
+
+   
+  // When the month/year is selected, split and assign to hidden inputs
+  
+
+
+   </script>
+</head>
+<body>
+  <!-- Navbar -->
+  <%- include('admin-header') %>
+  <!-- Content Section -->
+  <br>
+  <div class="container mt-5">
+    <h2>Custom downloads</h2>
+    <div class="form-container">
+      <div id="resultMessage" class="<%= message.text ? '' : 'd-none' %>">
+        <% if (message && message.text) { %>
+          <div class="alert alert-<%= message.type %>" role="alert">
+            <%= message.text %>
+          </div>
+        <% } %>
+      </div>
+      
+      <form action="/facultyleavesinfo/leaves/custom" method="POST" onsubmit="return validateForm()">
+        
+       
+
+        
+        <div id="customField" class="mb-3" >
+          <label for="fromDate" class="form-label">From Date :</label>
+          <input type="date" name="fromDate" id="fromDate" class="form-control"><br>
+          <label for="toDate" class="form-label">To Date :</label>
+          <input type="date" name="toDate" id="toDate" class="form-control">
+        </div>
+        <div class="mb-3">
+          <label for="fname" class="form-label">Search Faculty Name:</label>
+          <input type="text" id="fname" name="fname" class="form-control" placeholder="Start typing faculty name..." autocomplete="off">
+          <ul id="nameList" class="list-group d-none"></ul>
+        </div>
+        <button type="submit" class="btn btn-primary">Download</button>
+      </form>
+    </div>
+  </div>
+</body>
+<script>
+  function validateForm() {
+    const from = document.getElementById('fromDate').value;
+  const to = document.getElementById('toDate').value;
+  const name = document.getElementById('fname').value;
+
+ 
+  
+  if (!from && !to && !name) {
+    alert("Please select date or name or both");
+    return false;
+  }
+  return true;
+}
+
+  // Live Search for Faculty Name
+  $(document).ready(function() {
+    $('#fname').on('input', function() {
+      const query = document.getElementById('fname').value;
+
+      // If the input is empty, hide the name list
+      if (query.length < 1) {
+        $('#nameList').addClass('d-none');
+        return;
+      }
+      const url = '/facultyleavesinfo/leaves/api/search-faculty?fname=' +encodeURIComponent(query);
+      // Make AJAX request to fetch faculty names
+      $.ajax({
+        url:url,
+        method: 'GET',
+        data: { fname: query },
+        success: function(data) {
+          let nameListHTML = '';
+          data.forEach(function(faculty) {
+            nameListHTML += `<li class="list-group-item" data-id="${faculty.fid}">${faculty.fname}</li>`;
+          });
+
+          // Display the list of matching names
+          if (nameListHTML) {
+            $('#nameList').html(nameListHTML).removeClass('d-none');
+          } else {
+            $('#nameList').addClass('d-none');
+          }
+        }
+      });
+    });
+
+    // Handle selection of faculty name
+    $(document).on('click', '#nameList li', function() {
+      const selectedName = $(this).text();
+      const facultyId = $(this).data('id');
+      $('#fname').val(selectedName); // Set the selected name in the input
+      $('#nameList').addClass('d-none'); // Hide the suggestion list
+    });
+  });
+</script>
+</html>

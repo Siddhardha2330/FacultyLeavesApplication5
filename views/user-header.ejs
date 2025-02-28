@@ -1,0 +1,201 @@
+<nav class="navbar navbar-expand-lg fixed-top">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="/user-home">Faculty Panel</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+      <ul class="navbar-nav">
+        <li class="nav-item">
+          <a class="nav-link" href="/apply-leave">Apply Leave</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/view-leave-applications">Leave Applications</a>
+        </li>
+        <li class="nav-item">
+          <span style="cursor: pointer;" class="nav-link change-password-btn">Change Password</span>
+        </li>
+        <li class="nav-item">
+          <form action="/logout" method="GET" class="d-inline">
+            <button type="submit" class="btn btn-logout">Logout</button>
+          </form>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+<style>
+  /* Modal Background */
+  .modal {
+  display: none; /* Ensure it is hidden initially */
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(56, 53, 53, 0.7);
+  
+  justify-content: center;
+  align-items: center;
+}
+
+
+
+/* Modal Content */
+.modal-content {
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  border-radius: 15px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  padding: 20px;
+  width: 350px;
+  text-align: center;
+  color: white;
+  animation: fadeIn 0.8s ease-in-out;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+/* Close Button */
+.close {
+  margin-left: 260px;
+  color: white;
+  float: right;
+  font-size: 24px;
+  cursor: pointer;
+}
+
+.close:hover {
+  color: #ff4747;
+}
+
+/* Form Inputs */
+.modal-content input {
+  width: 100%;
+  padding: 10px;
+  margin: 10px 0;
+  border: none;
+  border-radius: 5px;
+  background: rgba(255, 255, 255, 0.3);
+  color: white;
+}
+
+.modal-content input::placeholder {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.modal-content input:focus {
+  outline: none;
+  background: rgba(255, 255, 255, 0.5);
+}
+
+/* Submit Button */
+.modal-content button {
+  width: 100%;
+  padding: 10px;
+  background: #28a745;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.modal-content button:hover {
+  background: #218838;
+}
+
+/* Error Message */
+#errorMsg {
+  color: #ff4747;
+  font-weight: bold;
+  margin-top: 10px;
+}
+
+/* Animation */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+</style>
+<!-- Change Password Modal -->
+<div id="changePasswordModal" class="modal">
+  <div class="modal-content">
+    <span class="close" onclick="closeModal()">&times;</span>
+    <h2>Change Password</h2>
+    <form id="changePasswordForm">
+      <label for="oldPassword">Old Password:</label>
+      <input type="password" id="oldPassword" name="oldPassword" required>
+      
+      <label for="newPassword">New Password:</label>
+      <input type="password" id="newPassword" name="newPassword" required minlength="6">
+      
+      <label for="confirmPassword">Confirm Password:</label>
+      <input type="password" id="confirmPassword" name="confirmPassword" required>
+      
+      <button type="submit">Change Password</button>
+    </form>
+    <p id="errorMsg" style="color: red;"></p>
+  </div>
+</div>
+
+<script>
+function closeModal() {
+  document.getElementById("changePasswordModal").style.display = "none";
+}
+
+// Handle form submission
+document.getElementById("changePasswordForm").addEventListener("submit", async function(event) {
+  event.preventDefault();
+
+  const oldPassword = document.getElementById("oldPassword").value;
+  const newPassword = document.getElementById("newPassword").value;
+  const confirmPassword = document.getElementById("confirmPassword").value;
+
+  if (newPassword !== confirmPassword) {
+    document.getElementById("errorMsg").innerText = "New passwords do not match!";
+    return;
+  }
+
+  // Send request to update password
+  const response = await fetch("/facultyleavesinfo/auth/change-password", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ oldPassword, newPassword })
+  });
+
+  const data = await response.json();
+  if (data.success) {
+    alert("Password changed successfully!");
+    closeModal();
+  } else {
+    document.getElementById("errorMsg").innerText = data.message;
+  }
+});
+document.addEventListener("DOMContentLoaded", function () {
+  const modal = document.getElementById("changePasswordModal");
+  const changePasswordBtn = document.querySelector(".change-password-btn");
+
+  changePasswordBtn.addEventListener("click", function () {
+    modal.style.display = "flex"; // Show modal only when clicked
+  });
+
+  // Close modal when clicking close button
+  document.querySelector(".close").addEventListener("click", function () {
+    modal.style.display = "none";
+  });
+
+  // Close modal when clicking outside the modal-content
+  window.addEventListener("click", function (event) {
+    if (event.target === modal) {
+      modal.style.display = "none";
+    }
+  });
+});
+
+
+</script>
+
+
