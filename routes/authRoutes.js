@@ -32,7 +32,7 @@ module.exports = (db) => {
   
         if (user.status === "admin") {
           res.redirect("/admin-home"); // Corrected path
-        } else if(user.status === "user"){
+        } else if(user.status === "active"){
           res.redirect("/user-home"); // Corrected path
         }else{
           res.redirect("/sub-admin-home"); // Corrected path
