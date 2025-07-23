@@ -145,7 +145,9 @@ app.get("/api/faculty-leave-data", (req, res) => {
 app.get("/logout",(req, res) => {
   res.redirect("/facultyleavesinfo/auth/logout");
 });
-
+app.use((req, res, next) => {
+  res.status(404).send("Page not found");
+});
 // Error Handling
 app.use((req, res, next) => {
   res.status(404).send("Page not found");
