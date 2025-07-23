@@ -145,9 +145,12 @@ app.get("/api/faculty-leave-data", (req, res) => {
 app.get("/logout",(req, res) => {
   res.redirect("/facultyleavesinfo/auth/logout");
 });
-app.use((req, res, next) => {
-  res.status(404).send("Page not found");
+// ... existing code ...
+// Add this route before the 404 handler
+app.get("/", (req, res) => {
+  res.redirect("/facultyleavesinfo");
 });
+// ... existing code ...
 // Error Handling
 app.use((req, res, next) => {
   res.status(404).send("Page not found");
